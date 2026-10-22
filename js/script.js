@@ -115,7 +115,9 @@ const getInitialTheme = () => {
   if (storedTheme === 'light' || storedTheme === 'dark') {
     return storedTheme;
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+  // Default aplikasi selalu Light mode, mengikuti preferensi sistem perangkat.
+  return 'light';
 };
 
 const setTheme = (theme) => {

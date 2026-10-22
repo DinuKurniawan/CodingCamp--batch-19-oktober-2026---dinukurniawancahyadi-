@@ -17,6 +17,10 @@ project/
 │   └── style.css
 ├── js/
 │   └── script.js
+├── favicon.svg
+├── favicon.ico
+├── favicon-32.png
+├── apple-touch-icon.png
 ├── README.md
 └── BUILD_STEPS.md
 ```
@@ -59,6 +63,14 @@ Buat `index.html` dengan susunan:
 4. Elemen status/error memakai `role="alert"` atau `role="status"` agar terbaca screen reader.
 5. Overlay modal edit task diletakkan setelah `</div>` pembungkus `.app`, dengan `role="dialog"` + `aria-modal="true"`.
 6. Overlay modal konfirmasi hapus semua task memakai `role="alertdialog"` + `aria-describedby` untuk pesan konfirmasi.
+7. Logo browser dipasang lewat `<link rel="icon">` (SVG sebagai utama, ICO/PNG sebagai fallback) plus `apple-touch-icon` dan `theme-color`.
+
+```html
+<meta name="theme-color" content="#4f46e5" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+```
 
 Detail penting:
 
@@ -121,7 +133,7 @@ Tulis semua warna, radius, dan shadow sebagai CSS variables di `:root`, lalu ove
 Alur tema di JavaScript:
 
 1. Baca `productivity-dashboard:theme` dari Local Storage.
-2. Jika belum ada, ikuti preferensi sistem lewat `matchMedia('(prefers-color-scheme: dark)')`.
+2. Jika belum ada preferensi tersimpan, aplikasi selalu memakai **Light mode** (tidak mengikuti `prefers-color-scheme` perangkat).
 3. Pasang `data-theme` pada `<html>`.
 4. Saat toggle diklik: ganti tema, perbarui `aria-pressed`, lalu simpan pilihan.
 
@@ -558,6 +570,28 @@ Styling ikon:
 }
 ```
 
+### Step 9c — Logo browser (favicon)
+
+Logo memakai motif yang sama dengan aplikasi: **kartu rounded gradien indigo** + **ring timer** + **centang**. Semua varian file dibuat dari satu desain 64×64 agar konsisten.
+
+`favicon.svg` (dipakai browser modern):
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Productivity Dashboard">
+  <defs>
+    <linearGradient id="pdGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="1" stop-color="#4338ca" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#pdGradient)" />
+  <circle cx="32" cy="32" r="18" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="4.5" />
+  <path d="M23 32.5 29.5 39 41 26" fill="none" stroke="#ffffff" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+```
+
+`favicon.ico` (16/32/48) dan `favicon-32.png` dibuat dari desain yang sama, sedangkan `apple-touch-icon.png` (180×180) memakai bidang penuh tanpa sudut membulat karena iOS membulatkan sendiri.
+
 ### Step 10 — Inisialisasi, persistensi, dan QA akhir
 
 Urutan init:
@@ -621,6 +655,10 @@ Checklist akhir:
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Productivity Dashboard: sapaan, focus timer, to-do list, dan quick links dalam satu halaman." />
   <title>Productivity Dashboard</title>
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link rel="stylesheet" href="css/style.css" />
   <!-- Dimuat di head agar tema dari Local Storage diterapkan sebelum halaman dilukis. -->
   <script src="js/script.js"></script>
@@ -2081,7 +2119,9 @@ const getInitialTheme = () => {
   if (storedTheme === 'light' || storedTheme === 'dark') {
     return storedTheme;
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+  // Default aplikasi selalu Light mode, mengikuti preferensi sistem perangkat.
+  return 'light';
 };
 
 const setTheme = (theme) => {

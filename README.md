@@ -11,7 +11,7 @@ Buka `index.html` langsung di browser, atau pakai sebagai standalone app / brows
 - ⏱️ Jam dan tanggal real-time, diperbarui tiap detik
 - 👋 Greeting otomatis: Good Morning / Afternoon / Evening / Night
 - ✍️ Nama kustom pada sapaan ("Good Morning, Budi")
-- 🌓 Light & Dark mode, pilihan tersimpan permanen
+- 🌓 Light & Dark mode (default awal: Light), pilihan tersimpan permanen
 - ⏳ Focus timer 25 menit dengan progress ring, Start/Stop/Reset
 - ✅ To-do list: tambah, edit via modal overlay, checklist, hapus per task, hapus semua via modal konfirmasi, counter selesai
 - 🚫 Deteksi task duplikat (case-insensitive, tahan spasi ganda)
@@ -43,8 +43,34 @@ project/
 │   └── style.css       # Design tokens, layout, komponen, responsif
 ├── js/
 │   └── script.js       # Seluruh logika aplikasi
+├── favicon.svg         # Logo browser (SVG, scalable)
+├── favicon.ico         # Fallback untuk browser lama (16/32/48)
+├── favicon-32.png      # Fallback PNG
+├── apple-touch-icon.png# Ikon home screen iOS (180×180)
 ├── README.md           # Dokumentasi ini
 └── BUILD_STEPS.md      # Panduan build step-by-step + kode lengkap
+```
+
+---
+
+## Logo Browser (Favicon)
+
+Identitas visual proyek memakai **kartu rounded dengan gradien indigo** (`#6366f1 → #4338ca`), di dalamnya **ring timer** putih transparan dengan **centang putih** — menggabungkan dua ikon utama aplikasi (focus timer + task selesai).
+
+| File | Ukuran | Fungsi |
+|---|---|---|
+| `favicon.svg` | scalable | Ikon utama browser modern (Chrome, Firefox, Edge, Safari) |
+| `favicon.ico` | 16 / 32 / 48 | Fallback untuk browser lama & bookmark |
+| `favicon-32.png` | 32×32 | Fallback PNG |
+| `apple-touch-icon.png` | 180×180 | Ikon saat aplikasi ditambahkan ke home screen iOS |
+
+Sudah terhubung di `index.html`:
+
+```html
+<meta name="theme-color" content="#4f46e5" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 ```
 
 ---
@@ -102,7 +128,7 @@ Saat waktu habis: badge berubah ke "Selesai", muncul pesan "Sesi fokus selesai!"
 - **Hapus** menghapus link. Hanya URL `http`/`https` yang diterima.
 
 ### Tema
-Klik tombol **Light mode / Dark mode** di kanan atas. Pilihan tersimpan dan langsung diterapkan saat halaman dibuka berikutnya (tanpa kedipan tema).
+Saat pertama dibuka, aplikasi selalu dalam **Light mode**. Klik tombol **Light mode / Dark mode** di kanan atas untuk beralih — pilihan tersimpan di browser dan langsung diterapkan saat halaman dibuka berikutnya (tanpa kedipan tema). Menghapus data situs akan mengembalikan default ke Light mode.
 
 ---
 
@@ -131,7 +157,7 @@ Data bersifat lokal per browser/per profil — tidak ada sinkronisasi antar pera
 
 ## Catatan Teknis
 
-- **Tanpa flash tema** — `js/script.js` dimuat di `<head>` dan menerapkan `data-theme` sebelum body dirender; inisialisasi DOM menunggu `DOMContentLoaded`.
+- **Tanpa flash tema** — `js/script.js` dimuat di `<head>` dan menerapkan `data-theme` sebelum body dirender (default `light`), inisialisasi DOM menunggu `DOMContentLoaded`.
 - **Timer akurat & anti-double-interval** — sisa waktu dihitung dari `endTimestamp - Date.now()`, dan `Start` dijaga oleh nilai `endTimestamp`, bukan sekadar status tombol.
 - **Penyimpanan aman** — seluruh akses Local Storage memakai helper `getFromStorage` / `saveToStorage` dengan `try/catch`; data JSON rusak otomatis diabaikan dan tidak menyebabkan crash.
 - **Anti-XSS** — data pengguna selalu dirender dengan `textContent` atau properti DOM; `innerHTML` tidak pernah dipakai untuk data dari pengguna.
