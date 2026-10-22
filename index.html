@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Productivity Dashboard: sapaan, focus timer, to-do list, dan quick links dalam satu halaman." />
+  <title>Productivity Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Dimuat di head agar tema dari Local Storage diterapkan sebelum halaman dilukis. -->
+  <script src="js/script.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten utama</a>
+
+  <div class="app" id="app">
+    <!-- ===== Header: sapaan, jam, tanggal, nama, tema ===== -->
+    <header class="topbar">
+      <div class="greeting-block">
+        <p class="date" id="currentDate">Memuat tanggal...</p>
+        <h1 class="greeting" id="greeting">Good Morning</h1>
+
+        <div class="name-controls">
+          <button class="btn btn-ghost btn-small" id="editNameBtn" type="button">
+            Ubah nama
+          </button>
+
+          <form class="name-form" id="nameForm" hidden>
+            <label class="sr-only" for="nameInput">Nama kamu</label>
+            <input
+              class="input input-compact"
+              id="nameInput"
+              type="text"
+              maxlength="40"
+              placeholder="Nama kamu"
+              autocomplete="off"
+            />
+            <button class="btn btn-primary btn-small" type="submit">Simpan</button>
+            <button class="btn btn-ghost btn-small" id="cancelNameBtn" type="button">Batal</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="clock-block">
+        <p class="time" id="currentTime">00:00:00</p>
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Aktifkan dark mode"
+        >
+          <span class="theme-icon" id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel">Dark mode</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-grid" id="main" tabindex="-1">
+      <!-- ===== Focus Timer ===== -->
+      <section class="card timer-card" id="timerCard" aria-labelledby="timerTitle">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Sesi fokus</p>
+            <h2 id="timerTitle">Focus Timer</h2>
+          </div>
+          <span class="badge" id="timerStatus">Siap</span>
+        </div>
+
+        <div class="timer-display">
+          <svg class="timer-ring" viewBox="0 0 220 220" aria-hidden="true">
+            <circle class="timer-ring-track" cx="110" cy="110" r="96"></circle>
+            <circle
+              class="timer-ring-progress"
+              id="timerProgress"
+              cx="110"
+              cy="110"
+              r="96"
+              pathLength="100"
+            ></circle>
+          </svg>
+          <div class="timer-center">
+            <p class="timer-text" id="timerText" role="timer" aria-live="off">25:00</p>
+            <p class="timer-caption">menit fokus</p>
+          </div>
+        </div>
+
+        <div class="timer-actions">
+          <button class="btn btn-primary" id="startBtn" type="button">Start</button>
+          <button class="btn btn-secondary" id="stopBtn" type="button" disabled>Stop</button>
+          <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+        </div>
+
+        <p class="timer-message" id="timerMessage" role="status" aria-live="polite">
+          Siap memulai sesi fokus 25 menit.
+        </p>
+      </section>
+
+      <!-- ===== To-Do List ===== -->
+      <section class="card" aria-labelledby="todoTitle">
+        <div class="card-head card-head-split">
+          <div>
+            <p class="eyebrow">Rencana hari ini</p>
+            <h2 id="todoTitle">To-Do List</h2>
+          </div>
+          <div class="card-actions">
+            <span class="badge" id="todoCount">0 task</span>
+            <button
+              class="btn btn-ghost btn-small btn-danger"
+              id="clearAllBtn"
+              type="button"
+              disabled
+              aria-label="Hapus semua task"
+            >
+              Hapus semua
+            </button>
+          </div>
+        </div>
+
+        <form class="inline-form" id="todoForm" autocomplete="off">
+          <label class="sr-only" for="todoInput">Task baru</label>
+          <input
+            class="input"
+            id="todoInput"
+            type="text"
+            maxlength="120"
+            placeholder="Tambah task baru..."
+            aria-describedby="todoError"
+          />
+          <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+        <p class="form-error" id="todoError" role="alert"></p>
+
+        <ul class="todo-list" id="todoList"></ul>
+        <p class="empty-state" id="todoEmpty">Belum ada task. Tambahkan satu untuk memulai.</p>
+      </section>
+
+      <!-- ===== Quick Links ===== -->
+      <section class="card links-card" aria-labelledby="linksTitle">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Akses cepat</p>
+            <h2 id="linksTitle">Quick Links</h2>
+          </div>
+        </div>
+
+        <form class="link-form" id="linkForm" autocomplete="off">
+          <div class="field">
+            <label class="field-label" for="linkName">Nama link</label>
+            <input
+              class="input"
+              id="linkName"
+              type="text"
+              maxlength="40"
+              placeholder="Contoh: GitHub"
+              aria-describedby="linkError"
+            />
+          </div>
+          <div class="field">
+            <label class="field-label" for="linkUrl">URL</label>
+            <input
+              class="input"
+              id="linkUrl"
+              type="text"
+              maxlength="500"
+              placeholder="github.com atau https://github.com"
+              aria-describedby="linkError"
+            />
+          </div>
+          <button class="btn btn-primary link-submit" type="submit">Add link</button>
+        </form>
+        <p class="form-error" id="linkError" role="alert"></p>
+
+        <ul class="link-list" id="linkList"></ul>
+        <p class="empty-state" id="linkEmpty">Belum ada link favorit.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Semua data disimpan secara lokal di browser kamu.</p>
+    </footer>
+  </div>
+
+  <!-- ===== Modal overlay: edit task ===== -->
+  <div class="modal-overlay" id="taskModal" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="taskModalTitle"
+    >
+      <div class="modal-head">
+        <h2 id="taskModalTitle">Edit task</h2>
+        <button
+          class="icon-btn modal-close"
+          id="taskModalClose"
+          type="button"
+          aria-label="Tutup dialog edit task"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form id="taskEditForm" autocomplete="off">
+        <div class="field">
+          <label class="field-label" for="taskEditInput">Teks task</label>
+          <input
+            class="input"
+            id="taskEditInput"
+            type="text"
+            maxlength="120"
+            placeholder="Tulis ulang task..."
+            aria-describedby="taskEditError"
+          />
+          <p class="form-error" id="taskEditError" role="alert"></p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="taskEditCancel" type="button">Batal</button>
+          <button class="btn btn-primary" type="submit">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Modal overlay: hapus semua task ===== -->
+  <div class="modal-overlay" id="clearAllModal" hidden>
+    <div
+      class="modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="clearAllModalTitle"
+      aria-describedby="clearAllModalMessage"
+    >
+      <div class="modal-head">
+        <h2 id="clearAllModalTitle">Hapus semua task?</h2>
+        <button
+          class="icon-btn modal-close"
+          id="clearAllModalClose"
+          type="button"
+          aria-label="Tutup dialog hapus semua task"
+        >
+          ✕
+        </button>
+      </div>
+
+      <p class="modal-message" id="clearAllModalMessage">
+        Semua task pada daftar ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="clearAllCancel" type="button">Batal</button>
+        <button class="btn btn-danger-solid" id="clearAllConfirm" type="button">
+          Hapus semua
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
