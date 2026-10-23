@@ -265,10 +265,11 @@ Aturan penting:
 
 1. **Start** langsung berhenti jika `endTimestamp !== null`, sehingga klik berulang tidak membuat interval baru.
 2. Waktu dihitung dari `endTimestamp - Date.now()` agar tetap akurat meski tab di-throttle browser.
-3. **Stop** menyimpan sisa waktu dan menghentikan interval; Start berikutnya melanjutkan.
-4. **Reset** menghentikan interval dan mengembalikan `25:00`.
-5. Saat waktu habis: interval dibersihkan, badge menjadi “Selesai”, pesan muncul, kartu beranimasi, dan `document.title` berubah.
-6. Saat tab kembali aktif, panggil tick sekali untuk menyinkronkan waktu.
+3. **Stop** menyimpan sisa waktu dan menghentikan interval. Label tombol utama otomatis berganti menjadi **Lanjutkan** (bukan **Start**) karena sesi masih tersisa.
+4. **Lanjutkan** meneruskan sisa waktu, bukan mengulang dari `25:00`.
+5. **Reset** menghentikan interval, mengembalikan `25:00`, dan mengembalikan label tombol menjadi **Start**.
+6. Saat waktu habis: interval dibersihkan, badge menjadi “Selesai”, pesan muncul, kartu beranimasi, dan `document.title` berubah. Label kembali ke **Start** untuk sesi baru.
+7. Saat tab kembali aktif, panggil tick sekali untuk menyinkronkan waktu.
 
 ```js
 const startTimer = () => {
@@ -299,7 +300,18 @@ const elapsedPercentage =
 dom.timerProgress.style.strokeDashoffset = String(elapsedPercentage);
 ```
 
-**Cek:** klik Start dua kali cepat → hanya satu hitungan; Stop → status “Dijeda”; Start lagi → lanjut; Reset → 25:00; biarkan habis → notifikasi selesai dan Start bisa memulai sesi baru.
+Warna progress ring tidak diatur lewat JS; `stroke` diatur oleh CSS sebagai `var(--primary)` — warna indigo yang sama dengan tombol utama.
+
+Label tombol Start/Lanjutkan diturunkan dari state yang sama, sehingga selalu konsisten dengan status badge:
+
+```js
+const isPaused = !isRunning && !isFinished && remaining < FOCUS_DURATION_SECONDS;
+dom.startBtn.textContent = isPaused ? 'Lanjutkan' : 'Start';
+```
+
+**Cek:** klik Start dua kali cepat → hanya satu hitungan; Stop → status “Dijeda” dan tombol berubah menjadi **Lanjutkan**; klik **Lanjutkan** → hitungan meneruskan sisa waktu (bukan dari 25:00); Reset → 25:00 dan tombol kembali **Start**; biarkan habis → notifikasi selesai dan tombol kembali **Start** untuk sesi baru. Warnanya konstan biru indigo, sama dengan tombol.
+
+---
 
 ---
 
@@ -2261,14 +2273,21 @@ const renderTimer = () => {
   const seconds = remaining % 60;
   const isRunning = endTimestamp !== null;
   const isFinished = remaining === 0 && !isRunning;
+  const isPaused = !isRunning && !isFinished && remaining < FOCUS_DURATION_SECONDS;
 
   dom.timerText.textContent = `${padTwoDigits(minutes)}:${padTwoDigits(seconds)}`;
 
   const elapsedPercentage = ((FOCUS_DURATION_SECONDS - remaining) / FOCUS_DURATION_SECONDS) * 100;
   dom.timerProgress.style.strokeDashoffset = String(elapsedPercentage);
 
+  // Warna progress ring tidak diatur lewat JS; `stroke` diatur oleh CSS
+  // sebagai var(--primary) — warna indigo yang sama dengan tombol utama.
+
   dom.startBtn.disabled = isRunning;
   dom.stopBtn.disabled = !isRunning;
+
+  // Label tombol mengikuti status: sesi yang dijeda menampilkan "Lanjutkan".
+  dom.startBtn.textContent = isPaused ? 'Lanjutkan' : 'Start';
 
   if (isRunning) {
     dom.timerStatus.textContent = 'Berjalan';
@@ -2364,7 +2383,7 @@ const stopTimer = () => {
   state.timer.endTimestamp = null;
 
   renderTimer();
-  dom.timerMessage.textContent = 'Timer dijeda. Tekan Start untuk melanjutkan.';
+  dom.timerMessage.textContent = 'Timer dijeda. Tekan Lanjutkan untuk meneruskan sisa waktu.';
 };
 
 const resetTimer = () => {

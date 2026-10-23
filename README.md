@@ -106,10 +106,11 @@ Klik **Ubah nama** untuk menampilkan input, isi nama (maks. 40 karakter), lalu *
 
 ### Focus Timer
 - **Start** — countdown 25:00. Klik berulang tidak membuat timer ganda.
-- **Stop** — menjeda, sisa waktu disimpan; **Start** lagi melanjutkan.
-- **Reset** — kembali ke 25:00.
+- **Stop** — menjeda, sisa waktu disimpan, dan tombol **Start** otomatis berganti label menjadi **Lanjutkan**.
+- **Lanjutkan** — meneruskan sisa waktu (tidak mengulang dari 25:00).
+- **Reset** — kembali ke 25:00 dan label tombol kembali menjadi **Start**.
 
-Saat waktu habis: badge berubah ke "Selesai", muncul pesan "Sesi fokus selesai!", kartu beranimasi, dan judul tab berubah. Tekan **Start** lagi untuk sesi baru.
+Warna progress ring konstan biru indigo (`var(--primary)`) — warna yang sama dengan tombol utama, diatur lewat CSS.
 
 ### To-Do List
 - Tambah task lewat input + **Add**, atau tekan **Enter**.

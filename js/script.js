@@ -257,6 +257,7 @@ const renderTimer = () => {
   const seconds = remaining % 60;
   const isRunning = endTimestamp !== null;
   const isFinished = remaining === 0 && !isRunning;
+  const isPaused = !isRunning && !isFinished && remaining < FOCUS_DURATION_SECONDS;
 
   dom.timerText.textContent = `${padTwoDigits(minutes)}:${padTwoDigits(seconds)}`;
 
@@ -265,6 +266,9 @@ const renderTimer = () => {
 
   dom.startBtn.disabled = isRunning;
   dom.stopBtn.disabled = !isRunning;
+
+  // Label tombol mengikuti status: sesi yang dijeda menampilkan "Lanjutkan".
+  dom.startBtn.textContent = isPaused ? 'Lanjutkan' : 'Start';
 
   if (isRunning) {
     dom.timerStatus.textContent = 'Berjalan';
@@ -360,7 +364,7 @@ const stopTimer = () => {
   state.timer.endTimestamp = null;
 
   renderTimer();
-  dom.timerMessage.textContent = 'Timer dijeda. Tekan Start untuk melanjutkan.';
+  dom.timerMessage.textContent = 'Timer dijeda. Tekan Lanjutkan untuk meneruskan sisa waktu.';
 };
 
 const resetTimer = () => {
